@@ -1,4 +1,4 @@
-# FSS_Plugin_for_Brainstorm
+# FSS plugin for Brainstorm
 
 This process uses the Simulated Annealing Algorythm to apply the Functional Source Separation
 to a dataset, extracting the functional source S1 or M1 (one at a time).
@@ -15,7 +15,7 @@ The dataset consists of:
 
 ![The process GUI in the pipeline editor](/screenshot.png)
 
-## Options desription
+## Options description
 ### Dataset dependant options:
 - Sensor types or names (empty=all): indicates which sensors are to be considered for elaboration.
 - Sample frequency: the frequency at which the recordings were taken.
@@ -42,7 +42,7 @@ In the database explorer, drag and drop the raw file you want to work out into t
 In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
 ![The process selection](/pipeline_editor.png)
 
-Set the options in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
+Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
 ![The Matlab screen while the process is running](/screen_look.png)
 
 When the process ends its job, a new raw folder is available in the database explorer: the suffix "fss" means that the process has been applied.
