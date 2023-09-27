@@ -45,7 +45,9 @@ The dataset consists of:
 - Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
 ![The Matlab screen while the process is running](/screen_look.png)
 
-- When the process ends its job, a new raw folder is available in the database explorer: the suffix "fss" means that the process has been applied.
+- When the process ends its job, two lines appear at the bottom of the Matlab Command Window: the first indicates which stopping criteria caused the algorithm to end, the second shows how much time was spent to reach the end.
+![The Matlab screen at the end of the processing](/037_FinalMatComWin.PNG)
+- A new raw folder is now available in the database explorer: the suffix "fss" means that the process has been applied.
 ![The raw files resulting from the processing](/new_raw.png)
 
 - Import the new raw folder into the database, as described in [this tutorial](https://neuroimage.usc.edu/brainstorm/Tutorials/Epoching#Import_in_database), then apply the "Average by file" process as described in [this tutorial](https://neuroimage.usc.edu/brainstorm/Tutorials/Averaging#Averaging).
@@ -58,3 +60,4 @@ The dataset consists of:
 
 - When the time is set to the value of the maxSEF option used, the signals distribution shown in "2D Disc" visualization indicates the investigated area.
 
+![The resulting visualization](/045_interattivita.png)
