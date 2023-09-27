@@ -3,7 +3,7 @@
 This process uses the Simulated Annealing Algorythm to apply the Functional Source Separation
 to a dataset, extracting the functional source S1 or M1 (one at a time).
 
-##Dataset description
+## Dataset description
 
 The dataset consists of:
 - one subject, one acquisition run of about 4 minutes;
@@ -11,11 +11,31 @@ The dataset consists of:
 - subject stimulated by galvanic median nerve stimulation;
 - 63 acquisition channels and one trigger channel;
 
-##Options desription
+## Process GUI screenshot
 
-![The process GUI in the pipeline editor](assets/images/screenshot.png)
+![The process GUI in the pipeline editor](/screenshot.png)
 
-##How to use the process
+## Options desription
+### Dataset dependant options:
+- Sensor types or names (empty=all): indicates which sensors are to be considered for elaboration.
+- Sample frequency: the frequency at which the recordings were taken.
+- maxSEF: is the time at which one can read the maximum potential, referring to the trigger. It has to be read directly on the original EEG, since it depends on the subject itself.
+- lowSEF: is the time **before** maxSEF (on its left side) in which the potential is half the value of maxSEF potential. Expressed in absolute value.
+- highSEF: is the time **after** maxSEF (on its right side) in which the potential is half the value of maxSEF potential. Expressed in absolute value.
+- Trial Duration : the length of a single trial, including the pretrigger.
+- pretrigger: the small amount of time considered **before** a trigger instant.
+- bas: indicates the points between which the baseline is calculated.
+
+### Simulated Annealing options
+- Advanced SA options: if selected, it allows the user to change the successive Simulated Annealing parameters.
+- lambda: a balancing parameter used in computing the Simulated Annealing objective function.
+- Initial temperature for SA: the initial value of the temperature for SA.
+- Function Tolerance: one of the SA stopping criteria.
+- Max Time: another SA stopping criteria.
+- Max Stall Iteration: the third SA stopping criteria.
+- Reannealing Interval: causes the algorithm to restart from a temperature comprised between the current temperature and the previous starting one.
+
+## How to use the process
 
 In the database explorer, drag and drop the raw file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
 
