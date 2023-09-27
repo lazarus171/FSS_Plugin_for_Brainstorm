@@ -40,7 +40,7 @@ The dataset consists of:
 In the database explorer, drag and drop the raw file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
 
 In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
-![The process selection](/screenshot.png)
+![The process selection](/pipeline_editor.png)
 
 Set the options in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
 ![The Matlab screen while the process is running](/screen_look.png)
