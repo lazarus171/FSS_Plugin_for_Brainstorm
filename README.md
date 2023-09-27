@@ -13,6 +13,7 @@ The dataset consists of:
 
 ##Options desription
 
+![The process GUI in the pipeline editor](assets/images/screenshot.png)
 
 ##How to use the process
 
