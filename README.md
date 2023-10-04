@@ -24,13 +24,16 @@ The dataset consists of:
 - highSEF: is the time **after** maxSEF (on its right side) in which the potential is half the value of maxSEF potential. Expressed in absolute value.
 - Trial Duration : the length of a single trial, including the pretrigger.
 - pretrigger: the small amount of time considered **before** a trigger instant.
-- bas: indicates the points between which the baseline is calculated.
+- bas: indicates the points between which the baseline is calculated. If set at the same value, the process will consider the whole trial as the baseline.
 
 ### Simulated Annealing options
 - Advanced SA options: if selected, it allows the user to change the successive Simulated Annealing parameters.
 - lambda: a balancing parameter used in computing the Simulated Annealing objective function.
 - Initial temperature for SA: the initial value of the temperature for SA.
+- Noise threshold coefficient: used by the PCA whitening function, is the coefficient of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are conidered as noise.
+- Noise threshold exponent: used by the PCA whitening function, is the exponent of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are considered as noise.
 - Function Tolerance: one of the SA stopping criteria.
+- Max Iterations: one more SA stopping criteria: the algorithm stops after this number of iterations.
 - Max Time: another SA stopping criteria.
 - Max Stall Iteration: the third SA stopping criteria.
 - Reannealing Interval: causes the algorithm to restart from a temperature comprised between the current temperature and the previous starting one.
