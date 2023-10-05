@@ -13,7 +13,7 @@ The dataset consists of:
 
 ## Process GUI screenshot
 
-![The process GUI in the pipeline editor](/Images/screenshot.png)
+![The process GUI in the pipeline editor](/Images/002_processGUI.png)
 
 ## Options description
 ### Dataset dependant options:
@@ -43,15 +43,15 @@ The dataset consists of:
 - In the database explorer, drag and drop the raw file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
 
 - In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
-![The process selection](/Images/pipeline_editor.png)
+![The process selection](/Images/001_pipeline_editor.png)
 
 - Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
-![The Matlab screen while the process is running](/Images/screen_look.png)
+![The Matlab screen while the process is running](/Images/003_plugin_in_progress.png)
 
 - When the process ends its job, two lines appear at the bottom of the Matlab Command Window: the first indicates which stopping criteria caused the algorithm to end, the second shows how much time was spent to reach the end.
-![The Matlab screen at the end of the processing](/Images/037_FinalMatComWin.PNG)
+![The Matlab screen at the end of the processing](/Images/004_process_end.PNG)
 - A new raw folder is now available in the database explorer: the suffix "fss" means that the process has been applied.
-![The raw files resulting from the processing](/Images/new_raw.png)
+![The raw files resulting from the processing](/Images/005_new_raw.png)
 
 - Import the new raw folder into the database, as described in [this tutorial](https://neuroimage.usc.edu/brainstorm/Tutorials/Epoching#Import_in_database), then apply the "Average by file" process as described in [this tutorial](https://neuroimage.usc.edu/brainstorm/Tutorials/Averaging#Averaging).
 
@@ -63,4 +63,4 @@ The dataset consists of:
 
 - When the time is set to the value of the maxSEF option used, the signals distribution shown in "2D Disc" visualization indicates the investigated area.
 
-![The resulting visualization](/Images/045_interattivita.png)
+![The resulting visualization](/Images/006_visual_maxSEF.png)
