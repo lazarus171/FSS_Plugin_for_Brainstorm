@@ -59,6 +59,7 @@ The dataset consists of:
 ![The Matlab screen at the end of the processing](/Images/040_process_end.PNG)
 
 - A new file is now available in the database explorer: the first part of the file's name stands for the extracted brain area, while the suffix "fss" means that the process has been applied. In the figure below there are 2 files, each one resulting from a different run.
+
 ![The new files resulting from the processing](/Images/050_new_files.png)
 
 - To visualize the signals distribution on the scalp, obtained through the FSS process, right-click on the new file, then click on the "EEG" item and finally on the "2D Disc" item as shown below.
