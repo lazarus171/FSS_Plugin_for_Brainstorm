@@ -7,29 +7,29 @@ to a dataset, extracting the functional source S1 or M1 (one at a time).
 
 The dataset consists of:
 - one subject, one acquisition run of about 4 minutes;
-- sample frequency: 5000 Hz;
+- sampling frequency: 5000 Hz;
 - subject stimulated by galvanic median nerve stimulation;
-- 63 acquisition channels and one trigger channel;
+- 63 acquisition channels;
 
 ## Process GUI screenshot
 
-![The process GUI in the pipeline editor](/Images/002_processGUI.png)
+![The process GUI in the pipeline editor](/Images/020_processGUI.png)
 
 ## Options description
 ### Dataset dependant options:
 - Sensor types or names (empty=all): indicates which sensors are to be considered for elaboration.
-- Sample frequency: the frequency at which the recordings were taken.
-- maxSEF: is the time at which one can read the maximum potential, referring to the trigger. It has to be read directly on the original EEG, since it depends on the subject itself.
-- lowSEF: is the time **before** maxSEF (on its left side) in which the potential is half the value of maxSEF potential. Expressed in absolute value.
-- highSEF: is the time **after** maxSEF (on its right side) in which the potential is half the value of maxSEF potential. Expressed in absolute value.
+- Area: the brain area to be investigated.
 - Trial Duration : the length of a single trial, including the pretrigger.
 - pretrigger: the small amount of time considered **before** a trigger instant.
-- bas: indicates the points between which the baseline is calculated. If set at the same value, the process will consider the whole trial as the baseline.
+- bas: indicates the two points within which the baseline is calculated. If both points are set to the same value, the process will consider the whole trial as the baseline.
 
 ### Simulated Annealing options
 - Advanced SA options: if selected, it allows the user to change the successive Simulated Annealing parameters.
+- Annealing Function: the function used to perturbate the current configuration. [Further info](https://it.mathworks.com/help/gads/what-is-simulated-annealing.html)
+- Acceptance Function: the function used to accept or reject a new point in SA. [Further info](https://it.mathworks.com/help/gads/what-is-simulated-annealing.html)
+- Temperature Function: the function used to reduce temperature. [Further info](https://it.mathworks.com/help/gads/what-is-simulated-annealing.html)
 - lambda: a balancing parameter used in computing the Simulated Annealing objective function.
-- Initial temperature for SA: the initial value of the temperature for SA.
+- Initial temperature for SA: the starting value of the temperature for SA.
 - Noise threshold coefficient: used by the PCA whitening function, is the coefficient of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are conidered as noise.
 - Noise threshold exponent: used by the PCA whitening function, is the exponent of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are considered as noise.
 - Function Tolerance: one of the SA stopping criteria.
@@ -40,27 +40,29 @@ The dataset consists of:
 
 ## How to use the process
 
-- In the database explorer, drag and drop the raw file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
+- This process doesn't work on raw files, so that you could need to import your raw files in the Brainstorm database: to do this, just right-click on the file you want to use and select the "Import in database" item.
+![Raw file importing](/Images/001_import_raw.png)
+
+- Set the proposed options leaving unchecked the "Create a separate folder for each event type" item, then press the "Import" button.
+![Importation options](/Images/002_import_panel.png)
+
+- In the database explorer, drag and drop the file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
+![The file selection](/Images/003_drag_rdrop_run.png)
 
 - In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
-![The process selection](/Images/001_pipeline_editor.png)
+![The process selection](/Images/010_pipeline_editor.png)
 
 - Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
-![The Matlab screen while the process is running](/Images/003_plugin_in_progress.png)
+![The Matlab screen while the process is running](/Images/030_plugin_in_progress.png)
 
 - When the process ends its job, two lines appear at the bottom of the Matlab Command Window: the first indicates which stopping criteria caused the algorithm to end, the second shows how much time was spent to reach the end.
-![The Matlab screen at the end of the processing](/Images/004_process_end.PNG)
-- A new raw folder is now available in the database explorer: the suffix "fss" means that the process has been applied.
-![The raw files resulting from the processing](/Images/005_new_raw.png)
+![The Matlab screen at the end of the processing](/Images/040_process_end.PNG)
 
-- Import the new raw folder into the database, as described in [this tutorial](https://neuroimage.usc.edu/brainstorm/Tutorials/Epoching#Import_in_database), then apply the "Average by file" process as described in [this tutorial](https://neuroimage.usc.edu/brainstorm/Tutorials/Averaging#Averaging).
+- A new file is now available in the database explorer: the first part of the file's name stands for the extracted brain area, while the suffix "fss" means that the process has been applied.
+![The new files resulting from the processing](/Images/050_new_files.png)
 
-- To view the response, right-click on the averaged file, then click on the "EEG" item and finally click on "Display time series".
+- To visualize the signals distribution on the scalp, obtained through the FSS process, right-click on the new file, then click on the "EEG" item and finally on the "2D Disc" item as shown below.
+![The new files resulting from the processing](/Images/060_visual_cmd.png)
 
-- To visualize the signals distribution on the scalp, obtained through the FSS process, repeat the sequence described above, but click on the "2D Disc" item instead of the "Display time series".
-
-- You can adjust the instant of visualization by using the buttons in the upper right corner of Brainstorm main window; the current value of time is shown by the red vertical line in the time series window.
-
-- When the time is set to the value of the maxSEF option used, the signals distribution shown in "2D Disc" visualization indicates the investigated area.
-
-![The resulting visualization](/Images/006_visual_maxSEF.png)
+- If everything went well, you should see the scalp distribution of the extracted signals, as shown in the figure below.
+![The resulting visualization](/Images/070_final_view.png)
