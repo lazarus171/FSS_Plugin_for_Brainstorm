@@ -25,9 +25,9 @@ The dataset consists of:
 
 ### Simulated Annealing options
 - Advanced SA options: if selected, it allows the user to change the successive Simulated Annealing parameters.
-- Annealing Function: the function used to perturbate the current configuration. [Further info](https://it.mathworks.com/help/gads/what-is-simulated-annealing.html)
-- Acceptance Function: the function used to accept or reject a new point in SA. [Further info](https://it.mathworks.com/help/gads/what-is-simulated-annealing.html)
-- Temperature Function: the function used to reduce temperature. [Further info](https://it.mathworks.com/help/gads/what-is-simulated-annealing.html)
+- Annealing Function: the function used to perturbate the current configuration. [Further info: see "Algorithm Settings"](https://it.mathworks.com/help/gads/simulated-annealing-options.html#bq26j8s-4)
+- Acceptance Function: the function used to accept or reject a new point in SA. [Further info: see "Algorithm Settings"](https://it.mathworks.com/help/gads/simulated-annealing-options.html#bq26j8s-4)
+- Temperature Function: the function used to reduce temperature. [Further info: see "Temperature Options"](https://it.mathworks.com/help/gads/simulated-annealing-options.html#bq26j8s-4)
 - lambda: a balancing parameter used in computing the Simulated Annealing objective function.
 - Initial temperature for SA: the starting value of the temperature for SA.
 - Noise threshold coefficient: used by the PCA whitening function, is the coefficient of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are conidered as noise.
@@ -47,7 +47,7 @@ The dataset consists of:
 ![Importation options](/Images/002_import_panel.png)
 
 - In the database explorer, drag and drop the file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
-![The file selection](/Images/003_drag_rdrop_run.png)
+![The file selection](/Images/003_drag_drop_run.png)
 
 - In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
 ![The process selection](/Images/010_pipeline_editor.png)
@@ -58,11 +58,11 @@ The dataset consists of:
 - When the process ends its job, two lines appear at the bottom of the Matlab Command Window: the first indicates which stopping criteria caused the algorithm to end, the second shows how much time was spent to reach the end.
 ![The Matlab screen at the end of the processing](/Images/040_process_end.PNG)
 
-- A new file is now available in the database explorer: the first part of the file's name stands for the extracted brain area, while the suffix "fss" means that the process has been applied.
+- A new file is now available in the database explorer: the first part of the file's name stands for the extracted brain area, while the suffix "fss" means that the process has been applied. In the figure below there are 2 files, each one resulting from a different run.
 ![The new files resulting from the processing](/Images/050_new_files.png)
 
 - To visualize the signals distribution on the scalp, obtained through the FSS process, right-click on the new file, then click on the "EEG" item and finally on the "2D Disc" item as shown below.
 ![The new files resulting from the processing](/Images/060_visual_cmd.png)
 
-- If everything went well, you should see the scalp distribution of the extracted signals, as shown in the figure below.
+- If everything went well, you should see the scalp distribution of the extracted signals.
 ![The resulting visualization](/Images/070_final_view.png)
