@@ -35,7 +35,6 @@ function sProcess = GetDescription()
     sProcess.options.sfolder.Comment = 'Result folder: ';
     sProcess.options.sfolder.Type = 'text';
     sProcess.options.sfolder.Value = {'D:\Test\Data\'};
-    sProcess.options.sfolder.Hidden = 1;
     % === Sensor types
     sProcess.options.sensortypes.Comment = 'Sensors type or name (empty=all): ';
     sProcess.options.sensortypes.Type    = 'text';
@@ -49,21 +48,21 @@ function sProcess = GetDescription()
     sProcess.options.smpfq.Comment = 'Sampling frequency: ';
     sProcess.options.smpfq.Type    = 'value';
     sProcess.options.smpfq.Value   = {5000, 'Hz', 0};
-    % === maxSEF
-    sProcess.options.maxSEF.Comment = 'maxSEF: ';
-    sProcess.options.maxSEF.Type = 'value';
-    sProcess.options.maxSEF.Value = {19, 'msec', 1};
-    sProcess.options.maxSEF.Hidden = 1;
-    % === lowSEF
-    sProcess.options.lowSEF.Comment = 'lowSEF: ';
-    sProcess.options.lowSEF.Type = 'value';
-    sProcess.options.lowSEF.Value = {1, 'msec', 1};
-    sProcess.options.lowSEF.Hidden = 1;
-    % === highSEF
-    sProcess.options.highSEF.Comment = 'highSEF: ';
-    sProcess.options.highSEF.Type = 'value';
-    sProcess.options.highSEF.Value = {2, 'msec', 1};
-    sProcess.options.highSEF.Hidden = 1;
+%     % === maxSEF
+%     sProcess.options.maxSEF.Comment = 'maxSEF: ';
+%     sProcess.options.maxSEF.Type = 'value';
+%     sProcess.options.maxSEF.Value = {19, 'msec', 1};
+%     sProcess.options.maxSEF.Hidden = 1;
+%     % === lowSEF
+%     sProcess.options.lowSEF.Comment = 'lowSEF: ';
+%     sProcess.options.lowSEF.Type = 'value';
+%     sProcess.options.lowSEF.Value = {1, 'msec', 1};
+%     sProcess.options.lowSEF.Hidden = 1;
+%     % === highSEF
+%     sProcess.options.highSEF.Comment = 'highSEF: ';
+%     sProcess.options.highSEF.Type = 'value';
+%     sProcess.options.highSEF.Value = {2, 'msec', 1};
+%     sProcess.options.highSEF.Hidden = 1;
     % === TrialDuration
     sProcess.options.TrialDuration.Comment = 'Trial Duration: ';
     sProcess.options.TrialDuration.Type = 'value';
@@ -161,12 +160,39 @@ function OutputFile = Run(sProcess, sInput)
     % === Get options
     if sProcess.options.selector.Value == 1
         area = 'S1';
+        lowSEF = 1;
+        maxSEF = 19;
+        highSEF = 2;
     else
         area = 'M1';
+        lowSEF = 1.8;
+        maxSEF = 22;
+        highSEF = 2;
     end
-    maxSEF = sProcess.options.maxSEF.Value{1};
-    lowSEF = sProcess.options.lowSEF.Value{1};
-    highSEF = sProcess.options.highSEF.Value{1};
+    
+    %Prepara la lista dei nomi dei parametri
+    prompt = {'lowSEF', 'maxSEF', 'highSEF'};
+    %Prepara il titolo della finestra di dialogo
+    dlgtitle = strcat('Check SEF value for ', area, ' area');
+    %imposta le dimensioni delle caselle di testo della finestra
+    dims = [1 20];
+    %Prepara la lista dei valori di default
+    definput = {num2str(lowSEF), num2str(maxSEF), num2str(highSEF)};
+    %Prepara la option structure
+    opts.Resize = 'on';
+    %Mostra la finestra di dialogo con le impostazioni sopra indicate
+    answer = inputdlg(prompt,dlgtitle,dims,definput, opts);
+    
+    %Imposta il valore dei parametri secondo le indicazioni ottenute tramite la
+    %finestra di dialogo
+    lowSEF = str2double(answer{1});
+    maxSEF = str2double(answer{2});
+    highSEF = str2double(answer{3});
+    
+%     maxSEF = sProcess.options.maxSEF.Value{1};
+%     lowSEF = sProcess.options.lowSEF.Value{1};
+%     highSEF = sProcess.options.highSEF.Value{1};
+
     TrialDuration = sProcess.options.TrialDuration.Value{1};
     pretrigger = sProcess.options.pretrigger.Value{1};
     bas = sProcess.options.bas.Value{1};
@@ -188,7 +214,7 @@ function OutputFile = Run(sProcess, sInput)
     sa_opt.annfcn = sProcess.options.annfcn.Value;
     sa_opt.tmpfcn = sProcess.options.tmpfcn.Value;
     sa_opt.accfcn = sProcess.options.accfcn.Value;
-    sfolder = sProcess.options.sfolder.Value;
+    sfolder = sProcess.options.sfolder.Value{1};
     
     
     % Get the trigger list
@@ -433,10 +459,8 @@ end
 %% ===== PLOTTER =====
 function plotter(w, AFS, WFS, FS, FS_ave, sa_out, sa_acc, sa_ref, area, fname, sfolder, sa_options, time, ave_time)
     % Path for data saving
-    dt_out_dir = sfolder;
-    dt_file = strcat(fname, '.mat');
-    dt_file = fullfile(dt_out_dir, dt_file);
-    % Path for images saving
+    dt_file = strcat(sfolder, fname, '.mat');
+        % Path for images saving
     % img_out_dir = 'D:\Test\Images\';
     % Saving all results in Matlab format
 
