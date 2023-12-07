@@ -52,7 +52,10 @@ The dataset consists of:
 - In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
 ![The process selection](/Images/010_pipeline_editor.png)
 
-- Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. While the process is running, you should see on your screen something like the image below.
+- Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. You can check the SEF values in the windows appearing before the optimization starts.
+![The checking window](/Images/025_area_related_values.png)
+
+- While the optimization process is running, you should see on your screen something like the image below.
 ![The Matlab screen while the process is running](/Images/030_plugin_in_progress.png)
 
 - When the process ends its job, two lines appear at the bottom of the Matlab Command Window: the first indicates which stopping criteria caused the algorithm to end, the second shows how much time was spent to reach the end.

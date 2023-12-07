@@ -31,10 +31,6 @@ function sProcess = GetDescription()
     sProcess.nMinFiles   = 1;
     sProcess.processDim  = [];   % Prevents from data splitting
     % === Options definition
-    % === Folder selection
-    sProcess.options.sfolder.Comment = 'Result folder: ';
-    sProcess.options.sfolder.Type = 'text';
-    sProcess.options.sfolder.Value = {'D:\Test\Data\'};
     % === Sensor types
     sProcess.options.sensortypes.Comment = 'Sensors type or name (empty=all): ';
     sProcess.options.sensortypes.Type    = 'text';
@@ -44,25 +40,10 @@ function sProcess = GetDescription()
     sProcess.options.selector.Comment = {'S1', 'M1', 'Area'};
     sProcess.options.selector.Type = 'radio_line';
     sProcess.options.selector.Value = 1;
-    % === Sample Frequency
+    % === Sampling Frequency
     sProcess.options.smpfq.Comment = 'Sampling frequency: ';
     sProcess.options.smpfq.Type    = 'value';
     sProcess.options.smpfq.Value   = {5000, 'Hz', 0};
-%     % === maxSEF
-%     sProcess.options.maxSEF.Comment = 'maxSEF: ';
-%     sProcess.options.maxSEF.Type = 'value';
-%     sProcess.options.maxSEF.Value = {19, 'msec', 1};
-%     sProcess.options.maxSEF.Hidden = 1;
-%     % === lowSEF
-%     sProcess.options.lowSEF.Comment = 'lowSEF: ';
-%     sProcess.options.lowSEF.Type = 'value';
-%     sProcess.options.lowSEF.Value = {1, 'msec', 1};
-%     sProcess.options.lowSEF.Hidden = 1;
-%     % === highSEF
-%     sProcess.options.highSEF.Comment = 'highSEF: ';
-%     sProcess.options.highSEF.Type = 'value';
-%     sProcess.options.highSEF.Value = {2, 'msec', 1};
-%     sProcess.options.highSEF.Hidden = 1;
     % === TrialDuration
     sProcess.options.TrialDuration.Comment = 'Trial Duration: ';
     sProcess.options.TrialDuration.Type = 'value';
@@ -125,7 +106,7 @@ function sProcess = GetDescription()
     % === Function Tolerance
     sProcess.options.functol.Comment = 'Function Tolerance: ';
     sProcess.options.functol.Type = 'value';
-    sProcess.options.functol.Value = {0.000500, '', 6};
+    sProcess.options.functol.Value = {0.001000, '', 6};
     sProcess.options.functol.Class = 'advanced';
     % === Max Time
     sProcess.options.maxtime.Comment = 'Max Time: ';
@@ -150,13 +131,12 @@ function Comment = FormatComment(sProcess)
 end
 
 %% ===== RUN =====
-function OutputFile = Run(sProcess, sInput)
+function [TopoOut] = Run(sProcess, sInput)
     
     % Load input files
     DataMat = in_bst_data(sInput.FileName);
     ChMat = in_bst_data(sInput.ChannelFile);
-   
-    % original valSEF = [1, 19, 2; 1.8, 22, 2];
+    
     % === Get options
     if sProcess.options.selector.Value == 1
         area = 'S1';
@@ -170,28 +150,24 @@ function OutputFile = Run(sProcess, sInput)
         highSEF = 2;
     end
     
-    %Prepara la lista dei nomi dei parametri
+    % Show the SEF values checking window
+    % Get the prompt list ready
     prompt = {'lowSEF', 'maxSEF', 'highSEF'};
-    %Prepara il titolo della finestra di dialogo
-    dlgtitle = strcat('Check SEF value for ', area, ' area');
-    %imposta le dimensioni delle caselle di testo della finestra
-    dims = [1 20];
-    %Prepara la lista dei valori di default
+    % Get the window title ready
+    dlgtitle = strcat(area, ' area SEF values');
+    % Set the text boxes dimensions
+    dims = [1 45];
+    % Get the default list ready
     definput = {num2str(lowSEF), num2str(maxSEF), num2str(highSEF)};
-    %Prepara la option structure
+    % Get the option structure ready
     opts.Resize = 'on';
-    %Mostra la finestra di dialogo con le impostazioni sopra indicate
+    % Show dialog window
     answer = inputdlg(prompt,dlgtitle,dims,definput, opts);
     
-    %Imposta il valore dei parametri secondo le indicazioni ottenute tramite la
-    %finestra di dialogo
+    % Set the SEF values according to window inputs
     lowSEF = str2double(answer{1});
     maxSEF = str2double(answer{2});
     highSEF = str2double(answer{3});
-    
-%     maxSEF = sProcess.options.maxSEF.Value{1};
-%     lowSEF = sProcess.options.lowSEF.Value{1};
-%     highSEF = sProcess.options.highSEF.Value{1};
 
     TrialDuration = sProcess.options.TrialDuration.Value{1};
     pretrigger = sProcess.options.pretrigger.Value{1};
@@ -213,9 +189,7 @@ function OutputFile = Run(sProcess, sInput)
     sa_opt.reanninter = sProcess.options.reanninter.Value{1};
     sa_opt.annfcn = sProcess.options.annfcn.Value;
     sa_opt.tmpfcn = sProcess.options.tmpfcn.Value;
-    sa_opt.accfcn = sProcess.options.accfcn.Value;
-    sfolder = sProcess.options.sfolder.Value{1};
-    
+    sa_opt.accfcn = sProcess.options.accfcn.Value;  
     
     % Get the trigger list
     triglist = DataMat.Events.times;
@@ -227,286 +201,194 @@ function OutputFile = Run(sProcess, sInput)
         DataMat.ChannelFlag(id) = strcmp(ChMat.Channel(id).Type, sProcess.options.sensortypes.Value);
         id = id+1;
     end
-    % List of unuseful channels
+    % List of useless channels
     k = find(~DataMat.ChannelFlag);
-    % Wipe out unuseful channels
+    % Wipe out useless channels
     DataMat.F(k, :) = [];
+    % Modify comment
     DataMat.Comment = strcat(area, '_', sProcess.FileTag);
     
     % Execute FSS_SEF code
-    [DataMat.F] = Compute(DataMat.F, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrigger,bas,smpfq,lambda,T0, sa_opt, DataMat.Comment, sfolder, area, DataMat.Time);
+    DataMat.F = Compute(DataMat.F, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrigger,bas,smpfq,lambda,T0, sa_opt);
     
-    % Output file #1 values
     % Refill unuseful channels
     DataMat.F(k, :) = 0;
     DataMat.Time = 0;
     OutputMat = DataMat;
+    
     % Generate a new file name in the same folder
     sStudy = bst_get('Study', sInput.iStudy);
-    OutputFile=bst_process('GetNewFilename',bst_fileparts(sStudy.FileName),sInput.FileType);
+    TopoOut=bst_process('GetNewFilename',bst_fileparts(sStudy.FileName),sInput.FileType);
+    
     % Save the new file
-    save(OutputFile, '-struct', 'OutputMat');
+    save(TopoOut, '-struct', 'OutputMat');
+    
     % Reference OutputFile in the database:
-    db_add_data(sInput.iStudy, OutputFile, OutputMat);
-    
-    % Resulting view
-    [micky, ~, ~] = view_topography(OutputFile, 'EEG', '2DDisc');
-    micky.Name = 'Micky';
-    
+    db_add_data(sInput.iStudy, TopoOut, OutputMat);
 end
 
 %% ===== EXTERNAL CALL =====
-function [AFS] = Compute(x, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrigger,bas,smpfq,lambda,T0, sa_opt, fname, sfolder, area, time)
+function [AFS] = Compute(x, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrigger,bas,smpfq,lambda,T0, sa_opt)
 
-global accepted;
-global refused;
-accepted = 0;
-refused = 0;
+    % EEG centering
+    medie_eeg = mean(x,2);
+    eeg_c = x - medie_eeg;
+    % Whitening and de_whitening martices calculation from centered EEG
+    [whiteMatrix,dewhiteMatrix] = pcaWhitening(eeg_c, sa_opt.nsThr);
+    % Centered EEG whitening
+    whiteEEGc = whiteMatrix*eeg_c;
+    % Simulated Annealing starting point initialization
+    w0 = whiteMatrix*(rand(size(eeg_c,1), 1)-0.5);
+    % Objective function definition
+    fun_obj =@(w) -f_obj(w, whiteEEGc, triglist, maxSEF, lowSEF, highSEF, TrialDuration, pretrigger, bas, lambda, smpfq);
 
-% EEG centering
-medie_eeg = mean(x,2);
-eeg_c = x - medie_eeg;
-% Whitening and de_whitening martices calculation from centered EEG
-[whiteMatrix,dewhiteMatrix] = pcaWhitening(eeg_c, sa_opt.nsThr);
-% Centered EEG whitening
-whiteEEGc = whiteMatrix*eeg_c;
-% Simulated Annealing starting point initialization
-w0 = whiteMatrix*(rand(size(eeg_c,1), 1)-0.5);
+    % Simulated Annealing settings
+    options = optimoptions(@simulannealbnd,...
+        'DataType','double',...
+        'Display','iter',...
+        'FunctionTolerance',sa_opt.functol,...
+        'HybridFcn', [],...
+        'InitialTemperature', T0,...
+        'MaxFunctionEvaluations', Inf,...
+        'MaxIterations', sa_opt.maxIter,...
+        'MaxTime', sa_opt.maxtime,...
+        'ObjectiveLimit',-Inf,...
+        'OutputFcn', [],...
+        'PlotFcn',{'saplotf','saplotx'},...
+        'MaxStallIterations', sa_opt.maxstalliter,...
+        'ReannealInterval', sa_opt.reanninter,...
+        'HybridFcn',[]);
 
-% Objective function definition
-fun_obj =@(w) -f_obj(w, whiteEEGc, triglist, maxSEF, lowSEF, highSEF, TrialDuration, pretrigger, bas, lambda, smpfq);
+    switch sa_opt.annfcn
+        case 1
+            options.AnnealingFcn = @ annealingboltz;
+        otherwise
+            options.AnnealingFcn = @ annealingfast;
+    end
+    switch sa_opt.accfcn
+        case 1
+            options.AcceptanceFcn = @(optimValues,newx,newfval) boltzacceptancefun(optimValues,newx,newfval);
+        otherwise
+            options.AcceptanceFcn = @ acceptancesa;
+    end
 
-% Simulated Annealing settings
-options = optimoptions(@simulannealbnd,...
-    'DataType','double',...
-    'Display','iter',...
-    'FunctionTolerance',sa_opt.functol,...
-    'HybridFcn', [],...
-    'InitialTemperature', T0,...
-    'MaxFunctionEvaluations', Inf,...
-    'MaxIterations', sa_opt.maxIter,...
-    'MaxStallIterations', sa_opt.maxstalliter,...
-    'MaxTime', sa_opt.maxtime,...
-    'ObjectiveLimit',-Inf,...
-    'OutputFcn', [],...
-    'PlotFcn',{'saplotf','saplotx'},...
-    'ReannealInterval', sa_opt.reanninter,...
-    'HybridFcn',[]);
+    switch sa_opt.tmpfcn
+        case 1
+            options.TemperatureFcn = @(optimValues,options) options.InitialTemperature.*0.8.^(optimValues.k);
+        case 2
+            options.TemperatureFcn =@ temperatureboltz;
+        case 3
+            options.TemperatureFcn = @ temperaturefast;
+        otherwise
+            options.TemperatureFcn = @ temperatureexp;
+    end
 
-switch sa_opt.annfcn
-    case 1
-        options.AnnealingFcn = @ annealingboltz;
-    otherwise
-        options.AnnealingFcn = @ annealingfast;
-end
-switch sa_opt.accfcn
-    case 1
-        options.AcceptanceFcn = @(optimValues,newx,newfval) boltzacceptancefun(optimValues,newx,newfval);
-    otherwise
-        options.AcceptanceFcn = @ acceptancesa;
-end
-    
-switch sa_opt.tmpfcn
-    case 1
-        options.TemperatureFcn = @(optimValues,options) options.InitialTemperature.*0.8.^(optimValues.k);
-    case 2
-        options.TemperatureFcn =@ temperatureboltz;
-    case 3
-        options.TemperatureFcn = @ temperaturefast;
-    otherwise
-        options.TemperatureFcn = @ temperatureexp;
-end
-  
-lower_bound=-ones(size(w0));
-lower_bound(1)=0; % Sign ambiguity removal on w.
-upper_bound=ones(size(w0));
+    lower_bound=-ones(size(w0));
+    lower_bound(1)=0; % Sign ambiguity removal on w.
+    upper_bound=ones(size(w0));
 
-% Objective Function minimization through Simulated Annealing
-rng('default');% for reproducibility
+    % Objective Function minimization through Simulated Annealing
 
-[w, ~, ~, sa_out]= simulannealbnd(fun_obj,w0,lower_bound,upper_bound,options);
-   
-w = w/norm(w);
+    rng('default');% for reproducibility
 
-% AFS and WFS calculation
-AFS = dewhiteMatrix*w;
-WFS = w'*whiteMatrix;
+    [w, ~, ~, sa_out]= simulannealbnd(fun_obj,w0,lower_bound,upper_bound,options);
 
-% Functional Source calculation
-FS = w'*(whiteEEGc+whiteMatrix*medie_eeg);
-FS_ave = trialAverage(FS, triglist, TrialDuration, pretrigger, smpfq);
-ave_time = zeros(size(FS_ave));
-ave_time = find(~ave_time)*(1000/smpfq)-pretrigger;
+    w = w/norm(w);
 
-% Reliability parameter calculation
-ratio = accepted/(accepted+refused);
+    % AFS and WFS calculation
+    AFS = dewhiteMatrix*w;
+    % WFS = w'*whiteMatrix;
+    % 
+    % % Functional Source calculation
+    % FS = w'*(whiteEEGc+whiteMatrix*medie_eeg);
+    % FS_ave = trialAverage(FS, triglist, TrialDuration, pretrigger, smpfq);
+    % ave_time = zeros(size(FS_ave));
+    % ave_time = find(~ave_time)*(1000/smpfq)-pretrigger;
 
-% Display results
-t=['Elapsed time is ', num2str(sa_out.totaltime), ' seconds.'];
-disp(t);
-t=['Resulting ratio: ', num2str(ratio)];
-disp(t);
-
-% Saving data
-plotter(w, AFS, WFS, FS, FS_ave, sa_out, accepted, refused, area, fname, sfolder, options, time, ave_time);
+    % Display results
+    t=['Elapsed time is ', num2str(sa_out.totaltime), ' seconds.'];
+    disp(t);
 end
 
 %% ===== WHITENING MATRIX =====
 function [whiteMatrix,dewhiteMatrix] = pcaWhitening(eeg_c, noiseLevel)
-% Whitening and de-whitening matrices calculation using PCA.
+    % Whitening and de-whitening matrices calculation using PCA.
 
-% Covariance matrix calculation
-covarianceMatrix = cov(eeg_c', 1);
+    % Covariance matrix calculation
+    covarianceMatrix = cov(eeg_c', 1);
 
-% Eigenvalues and related eigenvectors calculation
-[E, D] = eig (covarianceMatrix,'vector');
-[D,I]=sort(D,'descend');
-% PCA application
-k = nnz(D>noiseLevel);
-D=D(1:k);
-E=E(:,I(1:k));
+    % Eigenvalues and related eigenvectors calculation
+    [E, D] = eig (covarianceMatrix,'vector');
+    [D,I]=sort(D,'descend');
+    
+    % PCA application
+    k = nnz(D>noiseLevel);
+    D=D(1:k);
+    E=E(:,I(1:k));
 
-% Whitening and de-whitening matrices calculation
-whiteMatrix = (sqrt(D.^-1)).*E';
-dewhiteMatrix = E.*sqrt(D');
-
+    % Whitening and de-whitening matrices calculation
+    whiteMatrix = (sqrt(D.^-1)).*E';
+    dewhiteMatrix = E.*sqrt(D');
 end
 
 %% ===== OBJECTIVE FUNCTION =====
 function [Res] = f_obj(w, whiteEEGc, triggerList, maxSEF, lowSEF, highSEF, TrialDuration_ms, pretrigger_ms, bas_ms,lambda, smpfq)
-% Objective function for FSS definition:
-% f_obj(w)=J(w'*whiteEEGc)+lambda*RF_S1(w'*whiteEEGc)
-w=w/norm(w);
-evokedActivity = w'*whiteEEGc;
+    % Objective function for FSS definition:
+    % f_obj(w)=J(w'*whiteEEGc)+lambda*RF_S1(w'*whiteEEGc)
+    w=w/norm(w);
+    evokedActivity = w'*whiteEEGc;
 
-% Kurtosis calculation
-m2 = mean(evokedActivity.^2);
-m4 = mean(evokedActivity.^4);
-Kurtosis = m4/(m2^2)-3;
+    % Kurtosis calculation
+    m2 = mean(evokedActivity.^2);
+    m4 = mean(evokedActivity.^4);
+    Kurtosis = m4/(m2^2)-3;
 
-% Functional constraint calculation
-TrialDuration = round((TrialDuration_ms/1000)*smpfq);
-pretrigger = round((pretrigger_ms/1000)*smpfq);
+    % Functional constraint calculation
+    TrialDuration = round((TrialDuration_ms/1000)*smpfq);
+    pretrigger = round((pretrigger_ms/1000)*smpfq);
 
-% Baseline settings
-if bas_ms(1)~= bas_ms(2)
-    bas(1) = round(((pretrigger_ms+bas_ms(1))/1000)*smpfq);
-    bas(2) = round(((pretrigger_ms+bas_ms(2))/1000)*smpfq);
-else
-    bas = [];
-end
-sef = zeros(1,TrialDuration);
-maxSEF = round((maxSEF/1000)*smpfq);
-lowSEF = round((lowSEF/1000)*smpfq);
-highSEF = round((highSEF/1000)*smpfq);
-for k = 2:length(triggerList)-1
-    if isempty(bas) == 1
-        sef = sef+evokedActivity((triggerList(k)-pretrigger+1):(triggerList(k)-pretrigger+TrialDuration));
+    % Baseline settings
+    if bas_ms(1)~= bas_ms(2)
+        bas(1) = round(((pretrigger_ms+bas_ms(1))/1000)*smpfq);
+        bas(2) = round(((pretrigger_ms+bas_ms(2))/1000)*smpfq);
     else
-        sef = sef+evokedActivity((triggerList(k)-pretrigger+1):(triggerList(k)-pretrigger+TrialDuration))-mean(evokedActivity((triggerList(k)+bas(1)):(triggerList(k)+bas(2))));
+        bas = [];
     end
-end
-nave = length(triggerList)-2;
-sef = sef/nave;
-if isempty(bas) == 0
-    sef = sef - mean(sef(bas(1):bas(2)));
-end
-absSef = abs(sef);
-windows = ((maxSEF-lowSEF+pretrigger):(maxSEF+highSEF+pretrigger));
-if isempty(bas) == 0
-    indiceSEF = sum(absSef(windows),2)-sum(absSef(bas(1):bas(2)),2);
-else
-    indiceSEF = sum(absSef(windows),2);
-end
+    sef = zeros(1,TrialDuration);
+    maxSEF = round((maxSEF/1000)*smpfq);
+    lowSEF = round((lowSEF/1000)*smpfq);
+    highSEF = round((highSEF/1000)*smpfq);
+    for k = 2:length(triggerList)-1
+        if isempty(bas) == 1
+            sef = sef+evokedActivity((triggerList(k)-pretrigger+1):(triggerList(k)-pretrigger+TrialDuration));
+        else
+            sef = sef+evokedActivity((triggerList(k)-pretrigger+1):(triggerList(k)-pretrigger+TrialDuration))-mean(evokedActivity((triggerList(k)+bas(1)):(triggerList(k)+bas(2))));
+        end
+    end
+    nave = length(triggerList)-2;
+    sef = sef/nave;
+    if isempty(bas) == 0
+        sef = sef - mean(sef(bas(1):bas(2)));
+    end
+    absSef = abs(sef);
+    windows = ((maxSEF-lowSEF+pretrigger):(maxSEF+highSEF+pretrigger));
+    if isempty(bas) == 0
+        indiceSEF = sum(absSef(windows),2)-sum(absSef(bas(1):bas(2)),2);
+    else
+        indiceSEF = sum(absSef(windows),2);
+    end
 
-% Objective function return
-Res = Kurtosis+lambda*indiceSEF;
-
+    % Objective function return
+    Res = Kurtosis+lambda*indiceSEF;
 end
 
 %% ===== ACCEPTANCE FUNCTION =====
 function acceptpoint = boltzacceptancefun(optimValues,~,newfval)
-global accepted;
-global refused;
-if newfval <= optimValues.fval
-    acceptpoint = true;
-    accepted = accepted + 1;
-elseif rand(1)<=exp((optimValues.fval-newfval)/(max(optimValues.temperature)))
-    acceptpoint = true;
-    accepted = accepted + 1;
-else
-    acceptpoint = false;
-    refused = refused + 1;
-end
-end
-
-%% ===== FS TRIAL AVERAGE =====
-function [data_ave]=trialAverage(data, triggerList, durata, pretrigger, smpfq)
-
-%% Inizializzazioni
-nptdurata = round((durata/1000)*smpfq);
-nptpre = round((pretrigger/1000)*smpfq);
-data_ave = zeros(size(data,1),nptdurata);
-
-for k=2:length(triggerList)-1
-    data_ave = data_ave+data(:,triggerList(k)-nptpre+1:triggerList(k)-nptpre+nptdurata);
-end
-nave = length(triggerList)-2;
-data_ave = data_ave/nave;
-
-end
-
-%% ===== PLOTTER =====
-function plotter(w, AFS, WFS, FS, FS_ave, sa_out, sa_acc, sa_ref, area, fname, sfolder, sa_options, time, ave_time)
-    % Path for data saving
-    dt_file = strcat(sfolder, fname, '.mat');
-        % Path for images saving
-    % img_out_dir = 'D:\Test\Images\';
-    % Saving all results in Matlab format
-
-    save(dt_file, 'w', 'AFS', 'WFS', 'FS', 'FS_ave', 'sa_acc', 'sa_ref', 'sa_out', 'area', 'sa_options', 'time', 'ave_time');
-    
-    % Saving all results in Excel format
-    % dt_excel = strcat(dt_out_dir, 'Run00_', area, '.xlsx');
-    % writematrix(w, dt_excel, 'Sheet', 'w')
-    % writematrix(AFS, dt_excel, 'Sheet', 'AFS');
-    % writematrix(WFS, dt_excel, 'Sheet', 'WFS');
-    % writematrix(FS_ave, dt_excel, 'Sheet', 'FS_average');
-    % writematrix(FS(1,1:16000), dt_excel, 'Sheet', 'FS');
-
-%     saFig = gcf;
-%     pos = saFig.Position;
-% 
-%     pos(1) = pos(1)+30;
-%     pos(2) = pos(2)-30;
-%     FSavefig = figure('Name',strcat('FS Average_', area),'NumberTitle','off', 'Position', pos);
-%     plot(FS_ave)
-%     title(strcat('FS Average (', area, ' )'))
-%     ylabel('value')
-% 
-%     pos(1) = pos(1)+30;
-%     pos(2) = pos(2)-30;
-%     wfig = figure('Name',strcat('w_',area),'NumberTitle','off', 'Position', pos);
-%     bar(w)
-%     title(strcat('w (',area, ' )'))
-%     ylabel('value')
-% 
-%     pos(1) = pos(1)+30;
-%     pos(2) = pos(2)-30;
-%     AFSfig = figure('Name',strcat('Functional Source_', area),'NumberTitle','off', 'Position', pos);
-%     bar(AFS)
-%     title(strcat('AFS (', area,' )'))
-%     ylabel('value')
-% 
-%     pos(1) = pos(1)+30;
-%     pos(2) = pos(2)-30;
-%     micky = topoPlot(AFS, ch_xyz, pos, area);
-% 
-%     % Saving graphics
-%     exportgraphics(saFig, strcat(img_out_dir,'SA_00_', area, '.png'));
-%     exportgraphics(wfig, strcat(img_out_dir,'w_00_', area, '.png'));
-%     exportgraphics(FSavefig, strcat(img_out_dir,'FSave_00_', area, '.png'));
-%     exportgraphics(AFSfig, strcat(img_out_dir,'AFS_00_', area, '.png'));
-%     exportgraphics(micky, strcat(img_out_dir,'micky_00_', area, '.png'));
-    
+    if newfval <= optimValues.fval
+        acceptpoint = true;
+    elseif rand(1)<=exp((optimValues.fval-newfval)/(max(optimValues.temperature)))
+        acceptpoint = true;
+    else
+        acceptpoint = false;
+    end
 end
