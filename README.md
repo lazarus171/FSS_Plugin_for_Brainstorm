@@ -6,7 +6,7 @@ to a dataset, extracting the functional source S1 or M1 (one at a time).
 ## Dataset description
 
 The dataset consists of:
-- one subject, one acquisition run of about 4 minutes;
+- one subject, two acquisition runs (left and right stimulation) of about 4 minutes each;
 - sampling frequency: 5000 Hz;
 - subject stimulated by galvanic median nerve stimulation;
 - 63 acquisition channels;
@@ -35,8 +35,8 @@ The dataset consists of:
 - Function Tolerance: one of the SA stopping criteria.
 - Max Iterations: one more SA stopping criteria: the algorithm stops after this number of iterations.
 - Max Time: another SA stopping criteria.
-- Max Stall Iteration: the third SA stopping criteria.
-- Reannealing Interval: causes the algorithm to restart from a temperature comprised between the current temperature and the previous starting one.
+- Max Stall Iteration: the fourth SA stopping criteria.
+- Reannealing Interval: causes the algorithm to restart from a temperature comprised between the current temperature and the previous starting one to avoid the algorithm to return a local minimum.
 
 ## How to use the process
 

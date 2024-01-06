@@ -64,17 +64,17 @@ function sProcess = GetDescription()
     sProcess.options.control.Controller = 'advanced';
     
     % === Annealing Function
-    sProcess.options.annfcn.Comment = {'boltz', 'fast', 'Annealing Function: '};
+    sProcess.options.annfcn.Comment = {'boltz', 'fast', 'custom', 'Annealing Function: '};
     sProcess.options.annfcn.Type    = 'radio_line';
     sProcess.options.annfcn.Value   = 1;
     sProcess.options.annfcn.Class = 'advanced';
     % === Acceptance Function
-    sProcess.options.accfcn.Comment = {'custom', 'standard', 'Acceptance Function: '};
+    sProcess.options.accfcn.Comment = {'standard', 'custom', 'Acceptance Function: '};
     sProcess.options.accfcn.Type    = 'radio_line';
     sProcess.options.accfcn.Value   = 1;
     sProcess.options.accfcn.Class = 'advanced';
     % === Temperature Function
-    sProcess.options.tmpfcn.Comment = {'custom', 'boltz', 'fast', 'exp' , 'Temperature Function: '};
+    sProcess.options.tmpfcn.Comment = {'boltz', 'fast', 'exp' , 'custom', 'Temperature Function: '};
     sProcess.options.tmpfcn.Type    = 'radio_line';
     sProcess.options.tmpfcn.Value   = 1;
     sProcess.options.tmpfcn.Class = 'advanced';
@@ -201,6 +201,7 @@ function [TopoOut] = Run(sProcess, sInput)
         DataMat.ChannelFlag(id) = strcmp(ChMat.Channel(id).Type, sProcess.options.sensortypes.Value);
         id = id+1;
     end
+	
     % List of useless channels
     k = find(~DataMat.ChannelFlag);
     % Wipe out useless channels
@@ -233,13 +234,15 @@ function [AFS] = Compute(x, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrig
     % EEG centering
     medie_eeg = mean(x,2);
     eeg_c = x - medie_eeg;
-    % Whitening and de_whitening martices calculation from centered EEG
+    % Whitening and de_whitening matrices calculation from centered EEG
     [whiteMatrix,dewhiteMatrix] = pcaWhitening(eeg_c, sa_opt.nsThr);
     % Centered EEG whitening
     whiteEEGc = whiteMatrix*eeg_c;
-    % Simulated Annealing starting point initialization
+    
+	% Simulated Annealing starting point initialization
     w0 = whiteMatrix*(rand(size(eeg_c,1), 1)-0.5);
-    % Objective function definition
+    
+	% Objective function definition
     fun_obj =@(w) -f_obj(w, whiteEEGc, triglist, maxSEF, lowSEF, highSEF, TrialDuration, pretrigger, bas, lambda, smpfq);
 
     % Simulated Annealing settings
@@ -261,26 +264,27 @@ function [AFS] = Compute(x, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrig
 
     switch sa_opt.annfcn
         case 1
-            options.AnnealingFcn = @ annealingboltz;
+            options.AnnealingFcn = @annealingboltz;
         otherwise
-            options.AnnealingFcn = @ annealingfast;
+            options.AnnealingFcn = @annealingfast;
     end
+	
     switch sa_opt.accfcn
         case 1
-            options.AcceptanceFcn = @(optimValues,newx,newfval) boltzacceptancefun(optimValues,newx,newfval);
+            options.AcceptanceFcn = @acceptancesa;
         otherwise
-            options.AcceptanceFcn = @ acceptancesa;
+            options.AcceptanceFcn = @(optimValues,newx,newfval) boltzacceptancefun(optimValues,newx,newfval);
     end
 
     switch sa_opt.tmpfcn
         case 1
-            options.TemperatureFcn = @(optimValues,options) options.InitialTemperature.*0.8.^(optimValues.k);
+            options.TemperatureFcn = @temperatureboltz;
         case 2
-            options.TemperatureFcn =@ temperatureboltz;
+            options.TemperatureFcn =@temperaturefast;
         case 3
-            options.TemperatureFcn = @ temperaturefast;
+            options.TemperatureFcn = @temperatureexp;
         otherwise
-            options.TemperatureFcn = @ temperatureexp;
+            options.TemperatureFcn = @(optimValues,options) options.InitialTemperature.*0.8.^(optimValues.k);
     end
 
     lower_bound=-ones(size(w0));
@@ -288,18 +292,15 @@ function [AFS] = Compute(x, triglist,maxSEF,lowSEF,highSEF,TrialDuration,pretrig
     upper_bound=ones(size(w0));
 
     % Objective Function minimization through Simulated Annealing
-
     rng('default');% for reproducibility
-
     [w, ~, ~, sa_out]= simulannealbnd(fun_obj,w0,lower_bound,upper_bound,options);
-
     w = w/norm(w);
 
-    % AFS and WFS calculation
+    % AFS calculation
     AFS = dewhiteMatrix*w;
+	
+	% Other entity calculation (not used here)
     % WFS = w'*whiteMatrix;
-    % 
-    % % Functional Source calculation
     % FS = w'*(whiteEEGc+whiteMatrix*medie_eeg);
     % FS_ave = trialAverage(FS, triglist, TrialDuration, pretrigger, smpfq);
     % ave_time = zeros(size(FS_ave));
@@ -383,7 +384,7 @@ function [Res] = f_obj(w, whiteEEGc, triggerList, maxSEF, lowSEF, highSEF, Trial
 end
 
 %% ===== ACCEPTANCE FUNCTION =====
-function acceptpoint = boltzacceptancefun(optimValues,~,newfval)
+function acceptpoint = boltzacceptancefun(optimValues,newx,newfval)
     if newfval <= optimValues.fval
         acceptpoint = true;
     elseif rand(1)<=exp((optimValues.fval-newfval)/(max(optimValues.temperature)))
