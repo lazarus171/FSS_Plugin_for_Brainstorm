@@ -30,13 +30,13 @@ The dataset consists of:
 - Temperature Function: the function used to reduce temperature. [Further info: see "Temperature Options"](https://it.mathworks.com/help/gads/simulated-annealing-options.html#bq26j8s-4)
 - lambda: a balancing parameter used in computing the Simulated Annealing objective function.
 - Initial temperature for SA: the starting value of the temperature for SA.
-- Noise threshold coefficient: used by the PCA whitening function, is the coefficient of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are conidered as noise.
+- Noise threshold coefficient: used by the PCA whitening function, is the coefficient of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are considered as noise.
 - Noise threshold exponent: used by the PCA whitening function, is the exponent of the value (in scientific notation, **coefficient * 10^exponent**) under which the signals are considered as noise.
-- Function Tolerance: one of the SA stopping criteria.
+- Function Tolerance: the first SA stopping criteria: the algorithm stops when the change in the best function value is smaller than this option.
 - Max Iterations: one more SA stopping criteria: the algorithm stops after this number of iterations.
-- Max Time: another SA stopping criteria.
+- Max Time: another SA stopping criteria: the algorithm stops after the indicated number of seconds.
 - Max Stall Iteration: the fourth SA stopping criteria.
-- Reannealing Interval: causes the algorithm to restart from a temperature comprised between the current temperature and the previous starting one to avoid the algorithm to return a local minimum.
+- Reannealing Interval: causes the algorithm to restart from a temperature comprised between the current temperature and the previous starting one to avoid the algorithm to get trapped into a local minimum.
 
 ## How to use the process
 
@@ -49,7 +49,7 @@ The dataset consists of:
 - In the database explorer, drag and drop the file you want to work out into the "Process1" tab at the bottom of the window, then click on the "RUN" button on the left.
 ![The file selection](/Images/003_drag_drop_run.png)
 
-- In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS throug Simulated Annealing" item.
+- In the Pipeline editor window, click on the first button to see all the categories of processes available: choose the "Test" category, then click on the "FSS through Simulated Annealing" item.
 ![The process selection](/Images/010_pipeline_editor.png)
 
 - Set the [options](#options-description) in the process GUI as you need, then click on the "Run" button at the bottom of the window to make the process start. You can check the SEF values in the windows appearing before the optimization starts.
