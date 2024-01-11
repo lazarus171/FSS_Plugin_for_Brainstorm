@@ -71,12 +71,12 @@ function sProcess = GetDescription()
     % === Acceptance Function
     sProcess.options.accfcn.Comment = {'standard', 'custom', 'Acceptance Function: '};
     sProcess.options.accfcn.Type    = 'radio_line';
-    sProcess.options.accfcn.Value   = 1;
+    sProcess.options.accfcn.Value   = 2;
     sProcess.options.accfcn.Class = 'advanced';
     % === Temperature Function
     sProcess.options.tmpfcn.Comment = {'boltz', 'fast', 'exp' , 'custom', 'Temperature Function: '};
     sProcess.options.tmpfcn.Type    = 'radio_line';
-    sProcess.options.tmpfcn.Value   = 1;
+    sProcess.options.tmpfcn.Value   = 3;
     sProcess.options.tmpfcn.Class = 'advanced';
     % === Balancing Parameter Lambda
     sProcess.options.lambda.Comment = 'lambda: ';
@@ -154,7 +154,7 @@ function [TopoOut] = Run(sProcess, sInput)
     % Get the prompt list ready
     prompt = {'lowSEF', 'maxSEF', 'highSEF'};
     % Get the window title ready
-    dlgtitle = strcat(area, ' area SEF values');
+    dlgtitle = strcat(area, ' area SEF values check');
     % Set the text boxes dimensions
     dims = [1 45];
     % Get the default list ready
