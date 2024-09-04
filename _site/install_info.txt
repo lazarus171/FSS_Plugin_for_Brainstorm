@@ -1,7 +1,0 @@
-To install the FSS plugin, just save the 'process_fss.m' file into
-"user_folder/.brainstorm/process/"
-where "user_folder" stands for your Brainstorm installation folder.
-This will make the process available in the pipeline editor menus,
-when you use the Process1 or Process2 tabs.
-Avoid using capital letters, spaces or special characters in the process file name.
-Further info on https://neuroimage.usc.edu/brainstorm/Tutorials/TutUserProcess
